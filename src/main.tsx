@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import FavoritesFilmPage from './pages/FavoritesFilmPage.tsx'
 import PageNotFound from './pages/PageNotFound.tsx'
 import HomePage from './pages/HomePage.tsx'
+import FilmPage from './pages/FilmPage.tsx'
 
 
 const router = createBrowserRouter([
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: '/favorites',
         element: <FavoritesFilmPage />,
+      },
+      {
+        path: '/film/:id',
+        element: <FilmPage />,
       }
     ]
   },
