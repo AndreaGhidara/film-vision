@@ -33,7 +33,7 @@ export default function HomePage() {
 
     useEffect(() => {
         setIsLoading(true);
-
+        window.scrollTo(0, 0);
         const timer = setTimeout(() => {
             setIsLoading(false);
         }, 1000);
