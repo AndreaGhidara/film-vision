@@ -1,5 +1,5 @@
 import API from "@/config/apiClient";
-import { GenreResponse, ResponseMovies } from "@/types";
+import { GenreResponse, MovieDetails, ResponseMovies } from "@/types";
 
 
 export const getPopularMovies = async () => {
@@ -22,9 +22,10 @@ export const getUpcomingMovies = async () => {
     return response;
 }
 
+export const getMovieById = async (movieId: string) => {
+    console.log('movieId', movieId);
 
-export const getMovies = async () => {
-    const response: ResponseMovies = await API.get("/discover/movie");
+    const response: MovieDetails = await API.get(`/movie/${movieId}`);
     return response;
 }
 
@@ -37,3 +38,15 @@ export const getMovieSpecificGenres = async (genreId: string) => {
     const response: ResponseMovies = await API.get(`/discover/movie?with_genres=${genreId}`);
     return response;
 }
+
+export const specificPageSpecificGenres = async (page: string, genreId: string) => {
+    const response: ResponseMovies = await API.get(`/discover/movie?with_genres=${genreId}&page=${page}`);
+    console.log(response);
+    return response;
+}
+
+
+// export const getMovies = async () => {
+//     const response: ResponseMovies = await API.get("/discover/movie");
+//     return response;
+// }

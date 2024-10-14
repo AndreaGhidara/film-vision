@@ -1,84 +1,141 @@
+import CardMovie from "@/components/custom/CardMovie";
 import FilterFilm from "@/components/custom/FilterFilm";
 import Loader from "@/components/custom/Loader";
-import { useEffect, useState } from "react";
+import { getMovieSpecificGenres, specificPageSpecificGenres } from "@/lib/api";
+import { RootState } from "@/store";
+import { addFilms } from "@/stores/movie/movieSlice";
+import { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination"
+import { Button } from "@/components/ui/button";
 
 export default function MovieList() {
-    // const dispatch = useDispatch();
-    // const movies = useSelector((state: RootState) => state.movie.movies)
+    const dispatch = useDispatch();
+    const moviesGenre = useSelector((state: RootState) => state.genreMovie.genre);
+    const movies = useSelector((state: RootState) => state.movie.moviesSpecificGenre);
 
     const [error, setError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
 
-    // const fetchMovies = async () => {
-    //     setIsLoading(true);
-    //     try {
-    //         const response = await getMovies();
-    //         // console.log(response);
-    //         dispatch(addFilms(response.results));
-    //         setIsLoading(false);
-    //     } catch (error) {
-    //         console.log(error);
-    //         setError(true);
-    //         setIsLoading(false);
-    //     }
-    // }
+    const fetchMovieSpecificGenres = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            if (moviesGenre) {
+                const response = await getMovieSpecificGenres(moviesGenre);
+                setTotalPages(response.total_pages);
+                setCurrentPage(1); // Resetta alla prima pagina al cambio di genere
+                dispatch(addFilms({
+                    typeOfMovie: "moviesSpecificGenre",
+                    movies: response.results,
+                }));
+            }
+        } catch (error) {
+            console.log(error);
+            setError(true);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [dispatch, moviesGenre]);
 
-    // useEffect(() => {
-    //     fetchMovies();
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, []);
+    const handlePageChange = async (page: number) => {
+        console.log('qua');
 
-    // useEffect(() => {
-    //     setIsLoading(true);
-    //     window.scrollTo(0, 0);
-    //     const timer = setTimeout(() => {
-    //         setIsLoading(false);
-    //     }, 1000);
-    //     return () => clearTimeout(timer);
-    // }, [movies]);
+        try {
+            setIsLoading(true);
+            const response = await specificPageSpecificGenres(page.toString(), moviesGenre);
+            setCurrentPage(page);  // Aggiorna la pagina corrente
+            dispatch(addFilms({
+                typeOfMovie: "moviesSpecificGenre",
+                movies: response.results,
+            }));
+        } catch (error) {
+            console.log(error);
+            setError(true);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-    // Utilizza useCallback per memoizzare la funzione fetchMovies
-    // const fetchMovies = useCallback(async () => {
-    //     setIsLoading(true);
-    //     try {
-    //         const response = await getMovies();
-    //         dispatch(addFilms(response.results));
-    //         setIsLoading(false);
-    //     } catch (error) {
-    //         console.log(error);
-    //         setError(true);
-    //         setIsLoading(false);
-    //     }
-    // }, [dispatch]); // Il dispatch è una dipendenza stabile e non cambia, quindi va bene includerlo.
-
-    // useEffect(() => {
-    //     fetchMovies();
-    // }, [fetchMovies]); // Usa fetchMovies come dipendenza qui.
+    useEffect(() => {
+        if (moviesGenre) {
+            handlePageChange(currentPage);
+            window.scrollTo(0, 0);  // Scroll to top whenever page or genre changes
+        }
+    }, [currentPage, moviesGenre]);
 
     if (error) {
-        return <div>Error fetching movies. Please try again later.</div>;
+        return <div className="text-red-500">Error fetching movies. Please try again later.</div>;
     }
 
     if (isLoading) {
-        return <h1><Loader /></h1>;
+        return <Loader />;
     }
 
     return (
-        <>
-            <FilterFilm />
-            <div className="flex">
-                {/* <section className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="min-h-screen bg-black/90 text-white">
+            <div className="container mx-5 md:mx-auto py-10">
+                <FilterFilm />
+            </div>
+            <div className="flex flex-col container mx-5 md:mx-auto">
+                <section className="w-full grid grid-cols-2 lg:grid-cols-5 gap-4">
                     {movies && movies.length > 0 ? (
-                        movies.map((movie, index) => (
-                            <div key={index}>
-                                <CardFilm key={index} id={movie.id} title={movie.title} release_date={movie.release_date} overview={movie.overview} vote_average={movie.vote_average} poster_path={movie.poster_path} adult={false} backdrop_path={null} genre_ids={[]} original_language={""} original_title={""} popularity={0} video={false} vote_count={0} />
-                            </div>
-                        ))
+                        <>
+                            {movies.map((movie, index) => (
+                                <div key={index}>
+                                    <CardMovie lastPartOfPath={movie?.poster_path || ""} />
+                                </div>
+                            ))}
+                        </>
                     ) : (
                         <p>No movies available</p>
                     )}
-                </section> */}
+                </section>
+                <div className="w-full flex justify-end py-5">
+                    {movies && movies.length > 0 && (
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious
+                                        href="#"
+                                        onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                                    />
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationLink href="#">{currentPage}</PaginationLink>
+                                </PaginationItem>
+                                {totalPages > 1 && (
+                                    <>
+                                        <PaginationItem>
+                                            <PaginationEllipsis />
+                                        </PaginationItem>
+                                        <PaginationItem>
+                                            <PaginationLink href="#">{totalPages}</PaginationLink>
+                                        </PaginationItem>
+                                    </>
+                                )}
+                                <PaginationItem>
+                                    <Button
+                                        disabled={currentPage === totalPages}
+                                        onClick={() => handlePageChange(currentPage + 1)}>
+                                        <PaginationNext
+                                        />
+                                    </Button>
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    )}
+                </div>
             </div>
-        </>
+        </div >
     );
 }

@@ -7,7 +7,7 @@ export default function Hero() {
     const movie = useSelector((state: RootState) => state.movie.popularMovies[0]);
 
     return (
-        <div className="w-full h-[calc(100vh-64px)] relative">
+        <div className="w-full h-[calc(100vh-40vh)] relative">
             {movie && movie.backdrop_path && (
                 <div className="w-full h-full absolute bg-black z-10">
                     <img

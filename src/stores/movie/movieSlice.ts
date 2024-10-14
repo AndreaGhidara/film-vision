@@ -1,26 +1,32 @@
-import { MovieInterface } from '@/types'
+import { MovieDetails, MovieInterface } from '@/types'
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 export interface MoviesState {
-    movies: MovieInterface[]
+    moviesSpecificGenre: MovieInterface[],
     popularMovies: MovieInterface[],
     topRatedMovies: MovieInterface[],
     upcomingMovies: MovieInterface[],
     nowPlayingMovies: MovieInterface[],
+    favoriteMovies: MovieDetails[],
 }
 
 const initialState: MoviesState = {
-    movies: [],
+    moviesSpecificGenre: [],
     popularMovies: [],
     topRatedMovies: [],
     upcomingMovies: [],
     nowPlayingMovies: [],
+    favoriteMovies: [],
 }
 
 interface AddFilmsPayload {
-    typeOfMovie: keyof MoviesState; 
+    typeOfMovie: Exclude<keyof MoviesState, 'favoriteMovies'>; // Exclude 'favoriteMovies'
     movies: MovieInterface[];
+}
+
+interface AddFavoriteMoviePayload {
+    movie: MovieDetails;
 }
 
 export const moviesSlice = createSlice({
@@ -30,11 +36,18 @@ export const moviesSlice = createSlice({
         addFilms: (state, action: PayloadAction<AddFilmsPayload>) => {
             const { typeOfMovie, movies } = action.payload;
             state[typeOfMovie] = movies;
-        }
+        },
+        addFavoriteMovie: (state, action: PayloadAction<AddFavoriteMoviePayload>) => {
+            const movieExists = state.favoriteMovies.some(movie => movie.id === action.payload.movie.id);
+
+            if (!movieExists) {
+                state.favoriteMovies.push(action.payload.movie);
+            }
+        },
     },
 })
 
 // Action creators are generated for each case reducer function
-export const { addFilms } = moviesSlice.actions
+export const { addFilms, addFavoriteMovie } = moviesSlice.actions
 
 export default moviesSlice.reducer

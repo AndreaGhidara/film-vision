@@ -1,4 +1,4 @@
-import { getMovieGenres, getMovieSpecificGenres } from "@/lib/api";
+import { getMovieGenres } from "@/lib/api";
 import { useEffect, useState } from "react";
 import {
     Select,
@@ -10,66 +10,66 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Genre } from "@/types";
-import { useDispatch } from "react-redux";
-import { addFilms } from "@/stores/movie/movieSlice";
-import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+import { RootState } from "@/store";
+import { setGenre } from "@/stores/movie/genreSlice";
 
 export default function FilterFilm() {
     const dispatch = useDispatch();
-    const location = useLocation(); // Per monitorare il cambio di path
-
     const [genres, setGenres] = useState<Genre[]>([]);
-    const [selectedGenre, setSelectedGenre] = useState<string | undefined>(undefined); // Cambiato a undefined
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+    const moviesGenre = useSelector((state: RootState) => state.genreMovie.genre);
 
     const fetchMovieGenres = async () => {
         try {
+            setLoading(true);
             const response = await getMovieGenres();
             setGenres(response.genres);
+            setLoading(false);
         } catch (error) {
             console.log(error);
-        }
-    };
-
-    const fetchMovieSpecificGenres = async (genreId: string) => {
-        try {
-            const response = await getMovieSpecificGenres(genreId);
-            console.log(response);
-            dispatch(addFilms(response.results));
-        } catch (error) {
-            console.log(error);
+            setError(true);
+            setLoading(false);
         }
     };
 
     const handleGenreChange = (genre: string) => {
-        setSelectedGenre(genre);
-        fetchMovieSpecificGenres(genre);
+        dispatch(setGenre(genre));
     };
-
-    useEffect(() => {
-        setSelectedGenre(undefined); 
-    }, [location.pathname]);
 
     useEffect(() => {
         fetchMovieGenres();
     }, []);
 
+    useEffect(() => {
+        console.log(moviesGenre);
+    }, [moviesGenre]);
+
     return (
         <div className="flex items-center gap-5">
-            <Select value={selectedGenre} onValueChange={handleGenreChange}>
-                <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Seleziona un genere" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Generi di Film</SelectLabel>
-                        {genres.map((genre) => (
-                            <SelectItem key={genre.id} value={genre.id.toString()}>
-                                {genre.name}
-                            </SelectItem>
-                        ))}
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+            {loading ? (
+                <p>Loading genres...</p>
+            ) : error ? (
+                <p className="text-red-500">Error loading genres</p>
+            ) : (
+                <Select onValueChange={handleGenreChange}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Seleziona un genere" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Generi di Film</SelectLabel>
+                            {genres.map((genre) => (
+                                <SelectItem key={genre.id} value={genre.id.toString()}>
+                                    {genre.name}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            )}
         </div>
     );
 }
