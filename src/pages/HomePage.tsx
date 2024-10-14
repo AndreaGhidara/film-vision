@@ -1,62 +1,62 @@
-import { getMovies } from "@/lib/api";
-import { useEffect, useState } from "react";
-import CardFilm from "@/components/custom/CardFilm";
+import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { addFilms } from "@/stores/movie/movieSlice";
 import Loader from "@/components/custom/Loader";
+import { getNowPlayingMovies, getPopularMovies, getTopRatedMovies, getUpcomingMovies } from "@/lib/api";
+import SwiperMovieHome from "@/components/custom/SwiperMovieHome";
+import 'swiper/css';
+import Hero from "@/components/custom/Hero";
 
 export default function HomePage() {
     const dispatch = useDispatch();
-    const movies = useSelector((state: RootState) => state.movie.movies)
+
+    // Seleziona individualmente ogni array dal Redux state
+    const popularMovies = useSelector((state: RootState) => state.movie.popularMovies);
+    const topRatedMovies = useSelector((state: RootState) => state.movie.topRatedMovies);
+    const upcomingMovies = useSelector((state: RootState) => state.movie.upcomingMovies);
+    const nowPlayingMovies = useSelector((state: RootState) => state.movie.nowPlayingMovies);
 
     const [error, setError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const fetchMovies = async () => {
+    const fetchMovies = useCallback(async () => {
         setIsLoading(true);
         try {
-            const response = await getMovies();
-            dispatch(addFilms(response.results));
+            const [responsePopularMovies, responseTopRatedMovies, responseUpcomingMovies, responseNowPlayingMovies] = await Promise.all([
+                getPopularMovies(),
+                getTopRatedMovies(),
+                getUpcomingMovies(),
+                getNowPlayingMovies(),
+            ]);
+
+            dispatch(addFilms({
+                typeOfMovie: "popularMovies",
+                movies: responsePopularMovies.results,
+            }));
+            dispatch(addFilms({
+                typeOfMovie: "topRatedMovies",
+                movies: responseTopRatedMovies.results,
+            }));
+            dispatch(addFilms({
+                typeOfMovie: "upcomingMovies",
+                movies: responseUpcomingMovies.results,
+            }));
+            dispatch(addFilms({
+                typeOfMovie: "nowPlayingMovies",
+                movies: responseNowPlayingMovies.results,
+            }));
             setIsLoading(false);
         } catch (error) {
             console.log(error);
             setError(true);
             setIsLoading(false);
         }
-    }
+    }, [dispatch]);
 
     useEffect(() => {
         fetchMovies();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
-        setIsLoading(true);
-        window.scrollTo(0, 0);
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 1000);
-        return () => clearTimeout(timer);
-    }, [movies]);
-
-    // Utilizza useCallback per memoizzare la funzione fetchMovies
-    // const fetchMovies = useCallback(async () => {
-    //     setIsLoading(true);
-    //     try {
-    //         const response = await getMovies();
-    //         dispatch(addFilms(response.results));
-    //         setIsLoading(false);
-    //     } catch (error) {
-    //         console.log(error);
-    //         setError(true);
-    //         setIsLoading(false);
-    //     }
-    // }, [dispatch]); // Il dispatch è una dipendenza stabile e non cambia, quindi va bene includerlo.
-
-    // useEffect(() => {
-    //     fetchMovies();
-    // }, [fetchMovies]); // Usa fetchMovies come dipendenza qui.
+    }, [fetchMovies]);
 
     if (error) {
         return <div>Error fetching movies. Please try again later.</div>;
@@ -68,17 +68,39 @@ export default function HomePage() {
 
     return (
         <>
-            <div className="flex">
-                <section className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {movies && movies.length > 0 ? (
-                        movies.map((movie, index) => (
-                            <div key={index}>
-                                <CardFilm key={index} id={movie.id} title={movie.title} release_date={movie.release_date} overview={movie.overview} vote_average={movie.vote_average} poster_path={movie.poster_path} adult={false} backdrop_path={null} genre_ids={[]} original_language={""} original_title={""} popularity={0} video={false} vote_count={0} />
-                            </div>
-                        ))
-                    ) : (
-                        <p>No movies available</p>
-                    )}
+            <Hero />
+            <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 bg-black/90 text-white">
+                <section>
+                    <div>
+                        <h2 className="scroll-m-20 pb-2 text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight first:mt-0">
+                            Popular Movies
+                        </h2>
+                    </div>
+                    <SwiperMovieHome movies={popularMovies} />
+                </section>
+                <section>
+                    <div>
+                        <h2 className="scroll-m-20 pb-2 text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight first:mt-0">
+                            Top Rated Movies
+                        </h2>
+                    </div>
+                    <SwiperMovieHome movies={topRatedMovies} />
+                </section>
+                <section>
+                    <div>
+                        <h2 className="scroll-m-20 pb-2 text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight first:mt-0">
+                            Upcoming Movies
+                        </h2>
+                    </div>
+                    <SwiperMovieHome movies={upcomingMovies} />
+                </section>
+                <section>
+                    <div>
+                        <h2 className="scroll-m-20 pb-2 text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight first:mt-0">
+                            Now Playing Movies
+                        </h2>
+                    </div>
+                    <SwiperMovieHome movies={nowPlayingMovies} />
                 </section>
             </div>
         </>

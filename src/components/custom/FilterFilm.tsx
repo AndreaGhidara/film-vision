@@ -33,6 +33,7 @@ export default function FilterFilm() {
     const fetchMovieSpecificGenres = async (genreId: string) => {
         try {
             const response = await getMovieSpecificGenres(genreId);
+            console.log(response);
             dispatch(addFilms(response.results));
         } catch (error) {
             console.log(error);
@@ -40,13 +41,12 @@ export default function FilterFilm() {
     };
 
     const handleGenreChange = (genre: string) => {
-        setSelectedGenre(genre); // Imposta il valore selezionato
-        fetchMovieSpecificGenres(genre); // Chiama l'API per ottenere i film del genere selezionato
+        setSelectedGenre(genre);
+        fetchMovieSpecificGenres(genre);
     };
 
-    // Resetta il valore della select quando cambia il path
     useEffect(() => {
-        setSelectedGenre(undefined); // Resetta lo stato della select
+        setSelectedGenre(undefined); 
     }, [location.pathname]);
 
     useEffect(() => {

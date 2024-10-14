@@ -14,7 +14,7 @@ import { MovieInterface } from "@/types"
 
 export default function CardFilm({ id, title, release_date, overview, vote_average, poster_path }: MovieInterface) {
     return (
-        <Card className="flex justify-center items-center">
+        <Card className="flex flex-col md:flex-row justify-center items-center">
             <div className="p-2 min-w-[200px] max-w-[200px] h-full">
                 <img src={`https://image.tmdb.org/t/p/original${poster_path}`} className="rounded-lg object-cover border-2 border-black shadow-xl" />
             </div>

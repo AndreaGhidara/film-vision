@@ -17,7 +17,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Link, Outlet } from "react-router-dom"
-import FilterFilm from "./components/custom/FilterFilm"
 
 const navLinks = [
   {
@@ -26,10 +25,16 @@ const navLinks = [
     icon: ""
   },
   {
+    name: "Movies",
+    path: "/movies",
+    icon: ""
+  },
+  {
     name: "Favorites",
     path: "/favorites",
     icon: ""
   },
+  
 ]
 
 function App() {
@@ -89,9 +94,7 @@ function App() {
             </SheetContent>
           </Sheet>
           <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-            <div >
-              <FilterFilm />
-            </div>
+
             <form className="ml-auto flex-1 sm:flex-initial">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -120,7 +123,7 @@ function App() {
             </DropdownMenu>
           </div>
         </header>
-        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+        <main>
           <Outlet />
         </main>
       </div>
