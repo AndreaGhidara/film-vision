@@ -39,14 +39,13 @@ export const getMovieSpecificGenres = async (genreId: string) => {
     return response;
 }
 
-export const specificPageSpecificGenres = async (page: string, genreId: string) => {
+export const specificPageSpecificGenres = async (page: string, genreId?: string) => {
     const response: ResponseMovies = await API.get(`/discover/movie?with_genres=${genreId}&page=${page}`);
     console.log(response);
     return response;
 }
 
-
-// export const getMovies = async () => {
-//     const response: ResponseMovies = await API.get("/discover/movie");
-//     return response;
-// }
+export const getMovies = async (page: string) => {
+    const response: ResponseMovies = await API.get(`/discover/movie?page=${page}`);
+    return response;
+}

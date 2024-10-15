@@ -69,7 +69,7 @@ export default function HomePage() {
     return (
         <>
             <Hero />
-            <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 bg-black/90 text-white">
+            <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 dark_bg">
                 <section>
                     <div>
                         <h2 className="scroll-m-20 pb-2 text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight first:mt-0">
