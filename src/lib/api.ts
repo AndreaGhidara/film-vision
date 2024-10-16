@@ -49,3 +49,8 @@ export const getMovies = async (page: string) => {
     const response: ResponseMovies = await API.get(`/discover/movie?page=${page}`);
     return response;
 }
+
+export const getMoviesByQuery = async (query: string) => {
+    const response: ResponseMovies = await API.get(`/search/movie?query=${query}`);
+    return response
+}

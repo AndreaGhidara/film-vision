@@ -16,6 +16,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Link } from "react-router-dom"
+import { getMoviesByQuery } from "@/lib/api"
+import { useDispatch } from "react-redux"
+import { addFilms } from "@/stores/movie/movieSlice"
 
 const navLinks = [
     {
@@ -33,9 +36,32 @@ const navLinks = [
         path: "/favorites",
         icon: ""
     },
-]
+];
 
 export default function Navbar() {
+    const dispatch = useDispatch();
+
+    const searchFilms = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const query = e.target.value;
+        console.log(query);
+        if (query.length > 2) {
+            try {
+                const response = await getMoviesByQuery(query);
+                dispatch(addFilms({
+                    typeOfMovie: "searchMovies",
+                    movies: response.results,
+                }))
+            } catch (error) {
+                console.error("Error fetching films:", error);
+            }
+        } else {
+            dispatch(addFilms({
+                typeOfMovie: "searchMovies",
+                movies: [],
+            }))
+        }
+    };
+
     return (
         <>
             <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
@@ -91,11 +117,11 @@ export default function Navbar() {
             <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
 
                 <form className="ml-auto flex-1 sm:flex-initial">
-                    <div className="relative">
+                    <div className="relative z-20">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             type="search"
-                            onClick={() => { console.log('click'); }}
+                            onChange={searchFilms}
                             placeholder="Search film..."
                             className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
                         />

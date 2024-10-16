@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
 
 import { cn } from "@/lib/utils"
@@ -62,8 +62,10 @@ export default function MovieList() {
         setCurrentPage(parseInt(page));
         try {
             let response;
-            if (genreId) {
-                response = await specificPageSpecificGenres(page, genreId);
+            if (genreId || value.id) {
+                console.log('set specify categori');
+
+                response = await specificPageSpecificGenres(page, genreId ? genreId : value.id.toString());
             } else {
                 response = await getMovies(page);
             }
@@ -99,7 +101,8 @@ export default function MovieList() {
     useEffect(() => {
         fetchMovieGenres();
         getMoviesAll(currentPage.toString());
-    }, [currentPage]);
+        window.scrollTo(0, 0);
+    }, []);
 
     if (error) {
         return <div>Error</div>;
@@ -164,13 +167,15 @@ export default function MovieList() {
                 ) : (
                     movies && movies.length > 0 ? (
                         <>
-                            <div className="w-full px-5 grid grid-cols-2 lg:grid-cols-6 gap-5">
-                                {movies.map((movie, index) => (
-                                    <Link to={`/film/${movie.id}`} key={index}>
-                                        <CardMovie lastPartOfPath={movie?.poster_path || ""} />
-                                    </Link>
-                                ))}
-                            </div>
+                            <Suspense fallback={<Loader />}>
+                                <div className="w-full px-5 grid grid-cols-2 lg:grid-cols-6 gap-5">
+                                    {movies.map((movie, index) => (
+                                        <Link to={`/film/${movie.id}`} key={index}>
+                                            <CardMovie lastPartOfPath={movie?.poster_path || ""} />
+                                        </Link>
+                                    ))}
+                                </div>
+                            </Suspense>
                             <div className="w-full flex justify-center mt-5">
                                 <Pagination>
                                     <PaginationContent>

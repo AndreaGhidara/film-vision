@@ -9,6 +9,7 @@ export interface MoviesState {
     upcomingMovies: MovieInterface[],
     nowPlayingMovies: MovieInterface[],
     favoriteMovies: MovieDetails[],
+    searchMovies: MovieInterface[],
 }
 
 const initialState: MoviesState = {
@@ -18,6 +19,7 @@ const initialState: MoviesState = {
     upcomingMovies: [],
     nowPlayingMovies: [],
     favoriteMovies: [],
+    searchMovies: [],
 }
 
 interface AddFilmsPayload {
