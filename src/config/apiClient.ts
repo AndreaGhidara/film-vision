@@ -14,18 +14,9 @@ API.interceptors.response.use(
     (response) => response.data,
     (error) => {
         if (error.response) {
-            switch (error.response.status) {
-                case 404:
-                    console.error("Risorsa non trovata");
-                    break;
-                case 500:
-                    console.error("Errore del server");
-                    break;
-                default:
-                    console.error("Errore:", error.response.status);
-            }
+            return error.response;
         }
-        return Promise.reject(error);
+        return error;
     }
 );
 

@@ -1,7 +1,6 @@
 import API from "@/config/apiClient";
 import { GenreResponse, MovieDetails, ResponseMovies } from "@/types";
 
-
 export const getPopularMovies = async () => {
     const response: ResponseMovies = await API.get("/movie/popular");
     return response;

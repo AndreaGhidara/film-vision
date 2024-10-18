@@ -175,63 +175,63 @@ export default function MovieList() {
                                         </Link>
                                     ))}
                                 </div>
+                                <div className="w-full flex justify-center mt-5">
+                                    <Pagination>
+                                        <PaginationContent>
+                                            {/* Bottone per andare alla pagina precedente */}
+                                            <PaginationItem>
+                                                <PaginationPrevious onClick={previousPage} />
+                                            </PaginationItem>
+
+                                            {/* Gestione delle pagine precedenti, mostrale solo se non sei alla prima pagina */}
+                                            {currentPage > 1 && (
+                                                <PaginationItem>
+                                                    <PaginationLink onClick={() => changePage(currentPage - 1)}>
+                                                        {currentPage - 1}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            )}
+
+                                            {/* Pagina corrente */}
+                                            <PaginationItem>
+                                                <PaginationLink className="text-black" isActive={true}>
+                                                    {currentPage}
+                                                </PaginationLink>
+                                            </PaginationItem>
+
+                                            {/* Gestione delle pagine successive, mostrale solo se non sei all'ultima */}
+                                            {currentPage < totalPages && (
+                                                <PaginationItem>
+                                                    <PaginationLink onClick={() => changePage(currentPage + 1)}>
+                                                        {currentPage + 1}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            )}
+
+                                            {/* Ellissi per indicare più pagine */}
+                                            {currentPage < totalPages - 1 && (
+                                                <PaginationItem>
+                                                    <PaginationEllipsis />
+                                                </PaginationItem>
+                                            )}
+
+                                            {/* Link all'ultima pagina */}
+                                            {currentPage < totalPages && (
+                                                <PaginationItem>
+                                                    <PaginationLink onClick={() => changePage(totalPages)}>
+                                                        {totalPages}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            )}
+
+                                            {/* Bottone per andare alla pagina successiva */}
+                                            <PaginationItem>
+                                                <PaginationNext isActive={currentPage === totalPages} onClick={nextPage} />
+                                            </PaginationItem>
+                                        </PaginationContent>
+                                    </Pagination>
+                                </div>
                             </Suspense>
-                            <div className="w-full flex justify-center mt-5">
-                                <Pagination>
-                                    <PaginationContent>
-                                        {/* Bottone per andare alla pagina precedente */}
-                                        <PaginationItem>
-                                            <PaginationPrevious onClick={previousPage} />
-                                        </PaginationItem>
-
-                                        {/* Gestione delle pagine precedenti, mostrale solo se non sei alla prima pagina */}
-                                        {currentPage > 1 && (
-                                            <PaginationItem>
-                                                <PaginationLink onClick={() => changePage(currentPage - 1)}>
-                                                    {currentPage - 1}
-                                                </PaginationLink>
-                                            </PaginationItem>
-                                        )}
-
-                                        {/* Pagina corrente */}
-                                        <PaginationItem>
-                                            <PaginationLink className="text-black" isActive={true}>
-                                                {currentPage}
-                                            </PaginationLink>
-                                        </PaginationItem>
-
-                                        {/* Gestione delle pagine successive, mostrale solo se non sei all'ultima */}
-                                        {currentPage < totalPages && (
-                                            <PaginationItem>
-                                                <PaginationLink onClick={() => changePage(currentPage + 1)}>
-                                                    {currentPage + 1}
-                                                </PaginationLink>
-                                            </PaginationItem>
-                                        )}
-
-                                        {/* Ellissi per indicare più pagine */}
-                                        {currentPage < totalPages - 1 && (
-                                            <PaginationItem>
-                                                <PaginationEllipsis />
-                                            </PaginationItem>
-                                        )}
-
-                                        {/* Link all'ultima pagina */}
-                                        {currentPage < totalPages && (
-                                            <PaginationItem>
-                                                <PaginationLink onClick={() => changePage(totalPages)}>
-                                                    {totalPages}
-                                                </PaginationLink>
-                                            </PaginationItem>
-                                        )}
-
-                                        {/* Bottone per andare alla pagina successiva */}
-                                        <PaginationItem>
-                                            <PaginationNext isActive={currentPage === totalPages} onClick={nextPage} />
-                                        </PaginationItem>
-                                    </PaginationContent>
-                                </Pagination>
-                            </div>
                         </>
                     ) : (
                         <p>No movies available</p>

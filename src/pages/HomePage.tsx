@@ -11,7 +11,6 @@ import Hero from "@/components/custom/Hero";
 export default function HomePage() {
     const dispatch = useDispatch();
 
-    // Seleziona individualmente ogni array dal Redux state
     const popularMovies = useSelector((state: RootState) => state.movie.popularMovies);
     const topRatedMovies = useSelector((state: RootState) => state.movie.topRatedMovies);
     const upcomingMovies = useSelector((state: RootState) => state.movie.upcomingMovies);
